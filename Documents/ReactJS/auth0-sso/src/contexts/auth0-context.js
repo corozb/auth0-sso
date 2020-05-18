@@ -8,6 +8,8 @@ export const Auth0Context = createContext()
 export class Auth0Provider extends Component {
   state = {
     auth0Client: null,
+    isLoading: true,
+    isAuthenticated: false,
   }
 
   config = {
@@ -23,13 +25,19 @@ export class Auth0Provider extends Component {
   // initialize the auth0 library
   initializeAuth0 = async () => {
     const auth0Client = await createAuth0Client(this.config)
-    this.setState({ auth0Client })
+    const isAuthenticated = await auth0Client.isAuthenticated()
+
+    this.setState({ auth0Client, isLoading: false, isAuthenticated })
   }
 
   render() {
+    const { isLoading, isAuthenticated } = this.state
     const { children } = this.props
 
-    const configObject = {}
+    const configObject = {
+      isLoading,
+      isAuthenticated,
+    }
 
     return (
       <Auth0Context.Provider value={configObject}>
